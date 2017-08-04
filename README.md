@@ -7,7 +7,7 @@ Install GO enviroment and build the go file:
 configure your target platforms and architectures in targets.json. For example:
 
 ```json
-Here goes you
+
 {
   "targets" : [
       {"id": "windows" , "arch": ["386", "amd64"]},
@@ -16,6 +16,8 @@ Here goes you
   ]
 }
 ```
+
+And then ...
 
 Execute the CLI with -compile {file} to compile the target file.
 
