@@ -1,0 +1,7 @@
+{
+  "targets" : [
+      {"id": "windows" , "arch": ["386", "amd64"]},
+      {"id": "linux" , "arch": ["386", "amd64"]},
+      {"id": "darwin" , "arch": ["386", "amd64"]}
+  ]
+}
