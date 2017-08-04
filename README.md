@@ -4,7 +4,7 @@ Install GO enviroment and build the go file:
 
 **go build crossbuild.go**
 
-configure your target platforms and architectures in targets.json. For example:
+Then configure your target platforms and architectures in targets.json. For example:
 
 ```json
 
@@ -29,10 +29,15 @@ When compilations ends we will get a folder structure based on our settings.
 For example:
 
 windows/386/test.exe
+
 windows/amd64/test.exe
+
 linux/386/test
+
 linux/amd64/test
+
 darwin/386/test
+
 darwin/amd64/test
 
 
