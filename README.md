@@ -25,6 +25,16 @@ Example:
 
 **crossbuild.exe -compile test\test.go**
 
+When compilations ends we will get a folder structure based on our settings.
+For example:
+
+windows/386/test.exe
+windows/amd64/test.exe
+linux/386/test
+linux/amd64/test
+darwin/386/test
+darwin/amd64/test
+
 
 
 
