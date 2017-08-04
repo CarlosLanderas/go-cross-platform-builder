@@ -27,36 +27,48 @@ type Target struct {
 }
 
 var (
-	targetFile      string
-	platformsConfig string
-	wg              sync.WaitGroup
+	targetFile       string
+	platformsConfig  string
+	waitSync         sync.WaitGroup
+	binaryExtensions map[string]string
 )
 
 func compile(target Target, compileTarget string, ch chan bool) {
 
 	for _, arch := range target.Arch {
-		wg.Add(1)
+		waitSync.Add(1)
+
 		go func(arch string, target string) {
+
+			fmt.Printf("Compiling platform %s with arch: %s\n", target, arch)
 
 			env := os.Environ()
 			env = append(env, fmt.Sprintf("GOOS=%s", target))
 			env = append(env, fmt.Sprintf("GOARCH=%s", arch))
 
-			fmt.Printf("Compiling platform %s with arch: %s\n", target, arch)
-			cmd := exec.Command("go", "build", compileTarget)
+			targetAbsPath, _ := filepath.Abs(compileTarget)
+			ext := binaryExtensions[target]
+			fmt.Printf(ext)
+			targetPath := fmt.Sprintf("%s%s", getCleanFileName(filepath.Base(targetAbsPath)), binaryExtensions[target])
+
+			cmd := exec.Command("go", "build", "-o", fmt.Sprintf("%s\\%s\\%s",
+				target, arch, targetPath), compileTarget)
 			cmd.Env = env
 
 			err := cmd.Run()
 			if err != nil {
 				fmt.Println(err.Error())
-			} else {
-				fmt.Println("Compilation success")
 			}
 
-			defer wg.Done()
+			defer waitSync.Done()
 		}(arch, target.Id)
 	}
 
+}
+
+func getCleanFileName(fileName string) string {
+	extension := filepath.Ext(fileName)
+	return fileName[0 : len(fileName)-len(extension)]
 }
 
 func configureCLI() {
@@ -91,6 +103,11 @@ func ensureConfigsExist(config *CompileConfig) {
 func main() {
 	configureCLI()
 
+	binaryExtensions = map[string]string{
+		"windows": ".exe",
+		"darwin":  "",
+		"linux":   ""}
+
 	config := CompileConfig{
 		CompileTarget:  targetFile,
 		PlatformConfig: platformsConfig,
@@ -107,7 +124,7 @@ func main() {
 		compile(target, config.CompileTarget, ch)
 	}
 
-	wg.Wait()
+	waitSync.Wait()
 	fmt.Println("Compilations finished!")
 
 }
