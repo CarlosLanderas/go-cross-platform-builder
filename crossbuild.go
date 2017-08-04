@@ -36,12 +36,15 @@ func compile(target Target, compileTarget string, ch chan bool) {
 
 	for _, arch := range target.Arch {
 		wg.Add(1)
-		go func(arch string) {
+		go func(arch string, target string) {
 
-			os.Setenv("GOOS", target.Id)
-			os.Setenv("GOARCH", arch)
-			fmt.Printf("Compiling platform %s with arch: %s\n", target.Id, arch)
+			env := os.Environ()
+			env = append(env, fmt.Sprintf("GOOS=%s", target))
+			env = append(env, fmt.Sprintf("GOARCH=%s", arch))
+
+			fmt.Printf("Compiling platform %s with arch: %s\n", target, arch)
 			cmd := exec.Command("go", "build", compileTarget)
+			cmd.Env = env
 
 			err := cmd.Run()
 			if err != nil {
@@ -51,7 +54,7 @@ func compile(target Target, compileTarget string, ch chan bool) {
 			}
 
 			defer wg.Done()
-		}(arch)
+		}(arch, target.Id)
 	}
 
 }
