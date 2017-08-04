@@ -33,7 +33,7 @@ var (
 	binaryExtensions map[string]string
 )
 
-func compile(target Target, compileTarget string, ch chan bool) {
+func compile(target Target, compileTarget string) {
 
 	for _, arch := range target.Arch {
 		waitSync.Add(1)
@@ -47,8 +47,6 @@ func compile(target Target, compileTarget string, ch chan bool) {
 			env = append(env, fmt.Sprintf("GOARCH=%s", arch))
 
 			targetAbsPath, _ := filepath.Abs(compileTarget)
-			ext := binaryExtensions[target]
-			fmt.Printf(ext)
 			targetPath := fmt.Sprintf("%s%s", getCleanFileName(filepath.Base(targetAbsPath)), binaryExtensions[target])
 
 			cmd := exec.Command("go", "build", "-o", fmt.Sprintf("%s\\%s\\%s",
@@ -118,10 +116,9 @@ func main() {
 	var configuredTargets TargetConfig
 	unmarshallConfig(config.PlatformConfig, &configuredTargets)
 
-	ch := make(chan bool)
 	fmt.Println("Compiling path: ", config.CompileTarget)
 	for _, target := range configuredTargets.Targets {
-		compile(target, config.CompileTarget, ch)
+		compile(target, config.CompileTarget)
 	}
 
 	waitSync.Wait()
